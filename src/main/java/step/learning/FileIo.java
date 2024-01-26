@@ -1,15 +1,126 @@
 package step.learning;
 
-import java.io.File;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class FileIo {
     public void run() {
         // Робота з файлами
         // традиційно поділяється на дві групи:
         // - створення, пошук, копіювання (робота з файловою системою)
-        fsDemo() ;
-        listDemo() ;
+        // fsDemo() ;
+        // listDemo() ;
         // - збереження та відновлення даних
+        // ioDemo() ;
+        // readStreamDemo() ;
+        gsonDemo() ;
+    }
+
+    private void gsonDemo() {
+        JsonObject json = new JsonObject();
+        json.addProperty("name", "Felix");
+        json.addProperty("age", "12");
+        System.out.println( json.toString() ) ;
+        JsonObject j2 = JsonParser                // Парсер - з строки/файлу - у Json
+                .parseString(json.toString())     // res -> JsonElement
+                .getAsJsonObject();               // -> to JsonObject
+        System.out.println( j2.toString() ) ;
+    }
+    /*
+    Д.З. JSON телефонний каталог
+    при старті програма виводить наявні записи (ПІБ - телефон)
+    та пропонує додати новий запис (з консолі)
+    після введення дані додаються до файлу і наступний запуск
+    покаже їх у складі інших записів.
+    (використовувати формат JSON для збереження даних)
+     */
+
+    private void readStreamDemo() {
+        try( InputStream fileStream = Files.newInputStream( Paths.get("file.txt")) ) {
+            System.out.println( readStreamToEnd( fileStream ) ) ;
+        }
+        catch( IOException ex ) {
+            System.err.println( ex.getMessage() );
+        }
+    }
+
+    // вправа - зчитати потік як String
+    private String readStreamToEnd( InputStream inputStream ) throws IOException {
+        // варіант 1 (гірший)
+        /*
+        int sym ;
+        StringBuilder res = new StringBuilder();
+        while( ( sym = inputStream.read() ) != -1 ) {
+            // read -> byte + розширення до int для виняткових значень
+            // ?? -1(byte) =?= -1(int)
+            // ні, це різні сутності: -1(byte) = 11111111  -1(int) = 111(32)111
+            // -1(byte) розширене до int -> 000(24)00011111111
+            res.append((char)sym);
+        }
+        return res.toString() ;
+         */
+
+        // варіант 2 (кращий)
+        final byte[] buffer = new byte[32 * 1024];  // 32k
+        ByteArrayOutputStream byteBuilder = new ByteArrayOutputStream() ;
+        int len ;
+        while( ( len = inputStream.read( buffer ) ) > -1 ) {
+            byteBuilder.write( buffer, 0, len ) ;
+        }
+        return byteBuilder.toString() ;
+    }
+    private void ioDemo() {
+        // Основу роботи з файлами (як сховищами даних) складає потік (stream)
+        // try-with-resource - поєднання try та using(C#)
+        try (OutputStream writeStream = new FileOutputStream("file.txt")) {
+            writeStream.write(
+                    "Hello, World!".getBytes( StandardCharsets.UTF_8 )
+            );
+            // writeStream.close();
+        }
+        catch (IOException ex) {
+            System.err.println( ex.getMessage() );
+        }
+        // Stream - базові можливості, обмежені одним символом (байтом) або їх масивом
+        // є велика кількість розширень Stream, які спрощують роботу з основними типами даних
+        try ( FileWriter writer = new FileWriter( "file2.txt" ) ) {
+            writer.write("Hello, World!");
+        }
+        catch (IOException ex) {
+            System.err.println( ex.getMessage() );
+        }
+        try( DataOutputStream dos = new DataOutputStream(
+                Files.newOutputStream( Paths.get("file3.txt") )  // більш сучасна версія роботи з файлами
+        ) ) {
+            dos.writeDouble( 0.1 ) ;
+        }
+        catch (IOException ex) {
+            System.err.println( ex.getMessage() );
+        }
+
+        // ----------------------------------------------
+        // читання - так само, є InputStream з базовими можливостями
+        // FileReader, DataReaderStream - під типи даних
+        // BufferedInputStream, BufferedReader - з проміжним буфером (окрім системного)
+        try( Scanner scanner = new Scanner( new FileInputStream( "file.txt" ) ) ) {
+            while( scanner.hasNext() ) {
+                System.out.print( scanner.next() ) ;  // ! .next() читає слово (не рядок), роздільні символи
+            }                                         // (пробіли) ігноруються.
+            System.out.println();
+        }
+        catch (IOException ex) {
+            System.err.println( ex.getMessage() );
+        }
+        Scanner kbScanner = new Scanner( System.in ) ;   // keyboard scanner
+        System.out.print( "Your name: " ) ;
+        boolean name = kbScanner.nextBoolean() ;
+        System.out.println( "Hello, " + name ) ;
     }
 
     private void listDemo() {
