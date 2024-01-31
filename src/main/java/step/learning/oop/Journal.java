@@ -1,7 +1,31 @@
 package step.learning.oop;
 
-public class Journal {
+import java.text.ParseException;
+
+public class Journal extends Literature implements Copyable, Periodic {
     int number;
+    public Journal(String title, int number) throws ParseException {
+        super(title);
+        if(number <= 0) {
+            throw new NumberFormatException("Journal number must be positive") ;
+        }
+        this.number = number ;
+    }
+    public int getNumber() {
+        return number;
+    }
+
+
+    @Override
+    public String getCard() {
+        return String.format( "Journal. Title: '%s'. Number: '%d'",
+                super.getTitle(), this.getNumber() ) ;
+    }
+
+    @Override
+    public String getPeriod() {
+        return "Monthly";
+    }
 }
 /*
 Реалізувати сутність "Журнал" (номер, назва)
