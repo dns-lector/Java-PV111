@@ -1,5 +1,6 @@
 package step.learning;
 
+import step.learning.async.AsyncDemo;
 import step.learning.oop.OopDemo;
 
 public class App
@@ -9,7 +10,8 @@ public class App
         // System.out.println( "Hello World!" );
         // new Basics().run();
         // new FileIo().run();
-        new OopDemo().run();
+        // new OopDemo().run();
+        new AsyncDemo().run();
     }
 }
 /*
