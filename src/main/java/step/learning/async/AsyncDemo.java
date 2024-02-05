@@ -3,7 +3,8 @@ package step.learning.async;
 public class AsyncDemo {
     public void run() {
         System.out.println("Demo starts");
-        new MultiThread().demo();
+        // new MultiThread().demo();
+        new MultiTask().demo();
         System.out.println("Demo finishes");
     }
 }
