@@ -1,6 +1,11 @@
 package step.learning;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import step.learning.async.AsyncDemo;
+import step.learning.db.DbDemo;
+import step.learning.ioc.IocDemo;
+import step.learning.ioc.ServiceModule;
 import step.learning.oop.OopDemo;
 
 public class App
@@ -11,7 +16,11 @@ public class App
         // new Basics().run();
         // new FileIo().run();
         // new OopDemo().run();
-        new AsyncDemo().run();
+        // new AsyncDemo().run();
+        // new DbDemo().run();
+        Injector injector = Guice.createInjector( new ServiceModule() ) ;   // модуль IoC
+        IocDemo instance = injector.getInstance( IocDemo.class ) ;  // заміна new - Object Resolve
+        instance.run();
     }
 }
 /*
